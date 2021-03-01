@@ -77,9 +77,9 @@ const handleRequest = async (event: FetchEvent): Promise<Response> => {
           status: 404,
         });
       }
-      const { status, conclusion, created_at } = runs[0];
+      const { status, conclusion, created_at: createdAt } = runs[0];
       return new Response(
-        JSON.stringify({ status, conclusion, created_at }),
+        JSON.stringify({ status, conclusion, createdAt }),
         { headers: { ...responseHeaders, "content-type": "application/json" } },
       );
     }
