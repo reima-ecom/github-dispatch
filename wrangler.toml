@@ -2,3 +2,12 @@ name = "github-dispatch"
 type = "javascript"
 account_id = "25fd4a605fa32029740e7374ebb26cab"
 workers_dev = true
+
+kv_namespaces = [
+  { binding = "SETTINGS", id = "e19983b6e5ca4c3e8d1a8fe5940a0402", preview_id = "e19983b6e5ca4c3e8d1a8fe5940a0402" }
+]
+
+[build]
+upload.format = "service-worker"
+command = "deno bundle sw.ts sw.js"
+watch_dir = "."

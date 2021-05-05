@@ -5,12 +5,7 @@ type RefererConfig = {
 };
 
 declare const GITHUB_TOKEN: string;
-
-const WORKFLOW_BY_REFERER: RefererConfig = {
-  "us.reima.com": { repo: "reima-us", workflow: "import-shopify" },
-  "www.reima.ca": { repo: "reima-canada", workflow: "import-shopify" },
-  "www.reimajapan.com": { repo: "reima-jp", workflow: "import-shopify" },
-};
+declare const SETTINGS: KVNamespace;
 
 const requestHeaders = {
   "Content-Type": "application/json",
@@ -24,6 +19,25 @@ const responseHeaders = {
 };
 
 const handleRequest = async (event: FetchEvent): Promise<Response> => {
+  let workflowByReferrer: RefererConfig | null;
+  try {
+    workflowByReferrer = await SETTINGS.get(
+      "github-dispatch",
+      "json",
+    );
+  } catch (e) {
+    console.error(e);
+    return new Response("Error getting config (invalid JSON?)", {
+      headers: responseHeaders,
+      status: 500,
+    });
+  }
+  if (!workflowByReferrer) {
+    return new Response("No referer config", {
+      headers: responseHeaders,
+      status: 500,
+    });
+  }
   if (!GITHUB_TOKEN) {
     return new Response("No GitHub token", {
       headers: responseHeaders,
@@ -38,7 +52,7 @@ const handleRequest = async (event: FetchEvent): Promise<Response> => {
     });
   }
   const refererUrl = new URL(referer);
-  const workflow = WORKFLOW_BY_REFERER[refererUrl.hostname];
+  const workflow = workflowByReferrer[refererUrl.hostname];
   if (!workflow) {
     return new Response("Wrong referer", {
       headers: responseHeaders,
